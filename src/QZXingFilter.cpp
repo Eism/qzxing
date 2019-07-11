@@ -59,6 +59,11 @@ QZXingFilter::~QZXingFilter()
     }
 }
 
+int QZXingFilter::orientation() const
+{
+    return m_orientation;
+}
+
 void QZXingFilter::handleDecodingStarted()
 {
     decoding = true;
@@ -71,6 +76,16 @@ void QZXingFilter::handleDecodingFinished(bool succeeded)
     decoding = false;
     emit decodingFinished(succeeded, decoder.getProcessTimeOfLastDecoding());
     emit isDecodingChanged();
+}
+
+void QZXingFilter::setOrientation(int orientation)
+{
+    if (m_orientation == orientation) {
+        return;
+    }
+
+    m_orientation = orientation;
+    emit orientationChanged(m_orientation);
 }
 
 QVideoFilterRunnable * QZXingFilter::createFilterRunnable()
@@ -334,7 +349,16 @@ void QZXingFilterRunnable::processVideoFrameProbed(SimpleVideoFrame & videoFrame
 
     //QZXingImageProvider::getInstance()->storeImage(image);
 
-    decode(*image_ptr);
+    int orientation = filter ? filter->orientation() : 0;
+
+    QImage image = (*image_ptr).transformed([](QPoint center, int orientation) {
+            QMatrix matrix;
+            matrix.translate(center.x(), center.y());
+            matrix.rotate(-orientation);
+            return matrix;
+        }((*image_ptr).rect().center(), orientation));
+
+    decode(image);
 
     delete image_ptr;
 }
