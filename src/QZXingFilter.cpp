@@ -351,12 +351,12 @@ void QZXingFilterRunnable::processVideoFrameProbed(SimpleVideoFrame & videoFrame
 
     int orientation = filter ? filter->orientation() : 0;
 
-    QImage image = (*image_ptr).transformed([](QPoint center, int orientation) {
+    QImage image = image_ptr->transformed([](QPoint center, int orientation) {
             QMatrix matrix;
             matrix.translate(center.x(), center.y());
             matrix.rotate(-orientation);
             return matrix;
-        }((*image_ptr).rect().center(), orientation));
+        }(image_ptr->rect().center(), orientation));
 
     decode(image);
 
