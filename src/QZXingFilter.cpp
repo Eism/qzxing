@@ -19,9 +19,9 @@ namespace {
         const int D = int(U) - 128;
         const int E = int(V) - 128;
         return gray(
-            qBound<uchar>(0, uchar((298 * C + 409 * E + 128) >> 8), 255),
-            qBound<uchar>(0, uchar((298 * C - 100 * D - 208 * E + 128) >> 8), 255),
-            qBound<uchar>(0, uchar((298 * C + 516 * D + 128) >> 8), 255)
+            qBound(0, ((298 * C + 409 * E + 128) >> 8), 255),
+            qBound(0, ((298 * C - 100 * D - 208 * E + 128) >> 8), 255),
+            qBound(0, ((298 * C + 516 * D + 128) >> 8), 255)
         );
     }
 
@@ -261,6 +261,9 @@ void QZXingFilterRunnable::processVideoFrameProbed(SimpleVideoFrame & videoFrame
         image_ptr = rgbDataToGrayscale(data, captureRect, 3, 2, 1, 0, true);
         break;
     case QVideoFrame::Format_BGR32:
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 13, 0))
+    case QVideoFrame::Format_ABGR32:
+#endif
         image_ptr = rgbDataToGrayscale(data, captureRect, 3, 2, 1, 0);
         break;
     case QVideoFrame::Format_BGR24:
