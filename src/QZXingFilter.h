@@ -75,21 +75,27 @@ class QZXingFilter : public QAbstractVideoFilter
         Q_PROPERTY(bool decoding READ isDecoding NOTIFY isDecodingChanged)
         Q_PROPERTY(QZXing* decoder READ getDecoder)
         Q_PROPERTY(QRectF captureRect MEMBER captureRect NOTIFY captureRectChanged)
+        Q_PROPERTY(int orientation READ orientation WRITE setOrientation NOTIFY orientationChanged)
+
+    int orientation() const;
 
     signals:
         void isDecodingChanged();
         void decodingFinished(bool succeeded, int decodeTime);
         void decodingStarted();
         void captureRectChanged();
+        void orientationChanged(int orientation);
 
     private slots:
         void handleDecodingStarted();
         void handleDecodingFinished(bool succeeded);
+        void setOrientation(int orientation);
 
     private: /// Attributes
         QZXing decoder;
         bool decoding;
         QRectF captureRect;
+        int m_orientation;
 
         SimpleVideoFrame frame;
         QFuture<void> processThread;
