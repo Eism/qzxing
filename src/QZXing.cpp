@@ -416,13 +416,15 @@ QString QZXing::decodeImage(const QImage &image, int maxWidth, int maxHeight, bo
 
         if(!lastDecodeOperationSucceded_)
         {
-            hints.setTryHarder(true);
+            if (tryHarder_) {
+                hints.setTryHarder(true);
 
-            try {
-                res = decoder->decode(bb, hints);
-                processingTime = t.elapsed();
-                lastDecodeOperationSucceded_ = true;
-            } catch(zxing::Exception &/*e*/) {}
+                try {
+                    res = decoder->decode(bb, hints);
+                    processingTime = t.elapsed();
+                    lastDecodeOperationSucceded_ = true;
+                } catch(zxing::Exception &/*e*/) {}
+            }
 
             if (!lastDecodeOperationSucceded_ &&
                     hints.containsFormat(BarcodeFormat::UPC_EAN_EXTENSION) &&
@@ -437,7 +439,7 @@ QString QZXing::decodeImage(const QImage &image, int maxWidth, int maxHeight, bo
                 } catch(zxing::Exception &/*e*/) {}
             }
 
-            if (tryHarder_ && bb->isRotateSupported()) {
+            if (bb->isRotateSupported()) {
                 Ref<BinaryBitmap> bbTmp = bb;
 
                 for (int i=0; (i<3 && !lastDecodeOperationSucceded_); i++) {
